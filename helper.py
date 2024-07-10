@@ -73,23 +73,20 @@ Answer according to the language of the user's question.""",
         print(f"on_shutdown:{__name__}")
         pass
 
+
     async def inlet(self, body: dict, user: Optional[dict] = None) -> dict:
-        # If title generation is requested, skip the function calling filter
         if body.get("title", False):
             return body
 
         print(f"pipe:{__name__}")
         print(user)
 
-        # Get the last user message
         user_message = get_last_user_message(body["messages"])
         print("User message", user_message)
 
-        # Get the tools specs
         tools_specs = get_tools_specs(self.tools)
         print("Tools:", tools_specs)
 
-        # System prompt for function calling
         fc_system_prompt = (
             f"Tools: {json.dumps(tools_specs, indent=2)}"
             + """
@@ -97,51 +94,15 @@ If a function tool doesn't match the query, return an empty string. Else, pick a
 """
         )
 
-        r = None
-        try:
-            # Call the Ollama API to get the function response
-            r = requests.post(
-                url=f"{self.valves.OLLAMA_API_BASE_URL}/api/chat",
-                json={
-                    "stream": False,
-                    "model": self.valves.TASK_MODEL,
-                    "messages": [
-                        {
-                            "role": "system",
-                            "content": fc_system_prompt,
-                        },
-                        {
-                            "role": "user",
-                            "content": "History:\n"
-                            + "\n".join(
-                                [
-                                    f"{message['role']}: {message['content']}"
-                                    for message in body["messages"][::-1][:4]
-                                ]
-                            )
-                            + f"Query: {user_message}",
-                        },
-                    ],
-                    # TODO: dynamically add response_format?
-                    # "response_format": {"type": "json_object"},
-                },
-                headers={
-                    "Content-Type": "application/json",
-                },
-                stream=False,
-            )
-            r.raise_for_status()
+        response = await self.call_ollama_api(fc_system_prompt, user_message, body["messages"])
 
-            response = r.json()
-            print("Response:", response)
+        if response:
             content = response["message"]["content"]
 
-            # Parse the function response
             if content != "":
                 result = json.loads(content)
                 print(result)
 
-                # Call the function
                 if "name" in result:
                     function = getattr(self.tools, result["name"])
                     function_result = None
@@ -150,7 +111,6 @@ If a function tool doesn't match the query, return an empty string. Else, pick a
                     except Exception as e:
                         print(e)
 
-                    # Add the function result to the system prompt
                     if function_result:
                         system_prompt = self.valves.TEMPLATE.replace(
                             "{{CONTEXT}}", function_result
@@ -161,8 +121,45 @@ If a function tool doesn't match the query, return an empty string. Else, pick a
                             system_prompt, body["messages"]
                         )
 
-                        # Return the updated messages
                         return {**body, "messages": messages}
+
+        return body
+
+    async def call_ollama_api(self, system_prompt: str, user_message: str, messages: List[dict]) -> Optional[dict]:
+        try:
+            r = requests.post(
+                url=f"{self.valves.OLLAMA_API_BASE_URL}/api/chat",
+                json={
+                    "stream": False,
+                    "model": self.valves.TASK_MODEL,
+                    "messages": [
+                        {
+                            "role": "system",
+                            "content": system_prompt,
+                        },
+                        {
+                            "role": "user",
+                            "content": "History:\n"
+                            + "\n".join(
+                                [
+                                    f"{message['role']}: {message['content']}"
+                                    for message in messages[::-1][:4]
+                                ]
+                            )
+                            + f"Query: {user_message}",
+                        },
+                    ],
+                },
+                headers={
+                    "Content-Type": "application/json",
+                },
+                stream=False,
+            )
+            r.raise_for_status()
+
+            response = r.json()
+            print("Response:", response)
+            return response
 
         except Exception as e:
             print(f"Error: {e}")
@@ -173,8 +170,7 @@ If a function tool doesn't match the query, return an empty string. Else, pick a
                 except:
                     pass
 
-        return body
-
+        return None
 
 class Pipeline(OllamaPipelineFilter):
     class Valves(OllamaPipelineFilter.Valves):
