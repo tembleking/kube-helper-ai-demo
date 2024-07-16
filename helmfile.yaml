@@ -1,0 +1,164 @@
+repositories:
+  - name: open-webui
+    url: https://helm.openwebui.com/
+  - name: ollama-helm
+    url: https://otwld.github.io/ollama-helm/
+  - name: sysdig
+    url: https://charts.sysdig.com
+
+releases:
+  - name: open-webui
+    namespace: open-webui
+    chart: open-webui/open-webui
+    createNamespace: true
+    atomic: true
+    version: 3.0.5
+    values:
+      - image:
+          pullPolicy: IfNotPresent
+          repository: ghcr.io/open-webui/open-webui
+          tag: 0.3.8
+      - ollama:
+          enabled: false
+        persistence:
+          enabled: false # No need of persistence for now
+        pipelines:
+          enabled: false # Pipelines are enabled with other helm release
+        extraEnvVars:
+          - name: WEBUI_AUTH
+            value: "false"
+          - name: ENABLE_OLLAMA_API
+            value: "true"
+          - name: OLLAMA_BASE_URL
+            value: "http://ollama.ollama.svc.cluster.local:11434"
+          - name: DEFAULT_MODELS
+            value: llama3:instruct
+          - name: OPENAI_API_BASE_URL # This enables pipelines in the UI
+            value: http://open-webui-pipelines.open-webui-pipelines.svc.cluster.local:9099
+          - name: OPENAI_API_KEY
+            value: 0p3n-w3bu!
+        service:
+          annotations: {}
+          containerPort: 8080
+          labels: {}
+          loadBalancerClass: ""
+          nodePort: ""
+          port: 80
+          type: LoadBalancer
+  - name: open-webui-pipelines
+    namespace: open-webui-pipelines
+    chart: open-webui/pipelines
+    createNamespace: true
+    atomic: true
+    version: 0.0.3
+    values:
+    - image:
+        pullPolicy: Always
+        repository: tembleking/open-webui-pipelines
+        tag: latest
+    - ingress:
+        enabled: false
+      persistence:
+        enabled: false
+    hooks:
+      - events: [prepare]
+        command: bash
+        args:
+          - -c
+          - |
+            kubectl apply -f - <<EOF
+            apiVersion: rbac.authorization.k8s.io/v1
+            kind: ClusterRoleBinding
+            metadata:
+              name: open-webui-pipelines-cluster-admin
+            subjects:
+            - kind: ServiceAccount
+              name: default
+              namespace: open-webui-pipelines
+            roleRef:
+              kind: ClusterRole
+              name: cluster-admin
+              apiGroup: rbac.authorization.k8s.io
+            EOF
+      - events: [postsync]
+        command: bash
+        args:
+          - -c
+          - |
+            kubectl patch deployment open-webui-pipelines -n open-webui-pipelines --type=json -p='[{"op": "remove", "path": "/spec/template/spec/automountServiceAccountToken"}]'
+      - events: [preuninstall]
+        command: bash
+        args:
+          - -c
+          - |
+            kubectl delete clusterrolebinding open-webui-pipelines-cluster-admin
+  - name: ollama
+    namespace: ollama
+    chart: ollama-helm/ollama
+    createNamespace: true
+    atomic: true
+    version: 0.42.0
+    values:
+      - ollama:
+          models:
+            - llama3:instruct
+        nodeSelector: 
+          cloud.google.com/gke-accelerator: nvidia-l4
+          cloud.google.com/gke-accelerator-count: "1"
+        resources:
+          limits:        
+            nvidia.com/gpu: 1
+  - name: sysdig
+    namespace: sysdig
+    chart: sysdig/sysdig-deploy
+    createNamespace: true
+    atomic: true
+    version: 1.59.3
+    installed: true
+    values:
+      - global:
+          clusterConfig:
+            name: ai-demo-cluster
+          sysdig:
+            region: custom
+            apiHost: https://secure-staging.sysdig.com
+            {{- $accessKey := requiredEnv "SYSDIG_ACCESS_KEY" }}
+            accessKey: {{ $accessKey }}
+          kspm:
+            deploy: false
+          gke:
+            autopilot: true
+        agent:
+          collectorSettings:
+            collectorHost: collector-staging.sysdigcloud.com
+          # ebpf:
+          #   enabled: true
+          #   kind: universal_ebpf
+        nodeAnalyzer:
+          enabled: false
+          nodeAnalyzer:
+            benchmarkRunner:
+              deploy: false
+            hostAnalyzer:
+              deploy: false
+            runtimeScanner:
+              deploy: false
+            imageAnalyzer:
+              deploy: false
+            hostScanner:
+              deploy: false
+        kspmCollector:
+          enabled: false
+        admissionController:
+          enabled: false
+        clusterShield:
+          enabled: false
+          cluster_shield:
+            log_level: warn
+            features:
+              audit:
+                enabled: true
+              container_vulnerability_management:
+                enabled: false
+              posture:
+                enabled: false

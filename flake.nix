@@ -20,16 +20,36 @@
           config.allowUnfree = true;
           overlays = [poetry2nix-flake.overlays.default];
         };
-      in {
-        devShells.default = with pkgs; mkShellNoCC {
-          packages = [
-            (poetry2nix.mkPoetryEnv {
-              projectDir = self;
-              python = python3;
-            })
-            poetry
-          ];
+
+        helm_with_plugins = with pkgs;
+          wrapHelm kubernetes-helm {
+            # https://search.nixos.org/packages?channel=unstable&from=0&size=50&sort=relevance&type=packages&query=kubernetes-helmPlugins
+            plugins = with kubernetes-helmPlugins; [
+              helm-diff # Required for `helm diff` and `helmfile apply`
+            ];
+          };
+        helmfile_with_plugins = pkgs.helmfile-wrapped.override {
+          inherit (helm_with_plugins) pluginsDir;
         };
+
+        pipelines_image = pkgs.callPackage ./pipelines_image.nix {};
+      in {
+        packages = {
+          miner = pkgs.callPackage ./miner_image.nix {};
+          default = pipelines_image;
+        };
+        devShells.default = with pkgs;
+          mkShellNoCC {
+            packages = [
+              (poetry2nix.mkPoetryEnv {
+                projectDir = self;
+                python = python3;
+              })
+              poetry
+              helm_with_plugins
+              helmfile_with_plugins
+            ];
+          };
 
         formatter = pkgs.alejandra;
       }
