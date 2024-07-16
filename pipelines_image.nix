@@ -60,7 +60,7 @@
   '';
 
   image = dockerTools.buildLayeredImage {
-    name = "tembleking/open-webui-pipelines";
+    name = "ghcr.io/tembleking/open-webui-pipelines";
     tag = "latest";
     fromImage = baseImage;
     contents = [

@@ -54,7 +54,7 @@ releases:
     values:
     - image:
         pullPolicy: Always
-        repository: tembleking/open-webui-pipelines
+        repository: ghcr.io/tembleking/open-webui-pipelines
         tag: latest
     - ingress:
         enabled: false
