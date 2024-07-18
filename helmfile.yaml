@@ -60,6 +60,9 @@ releases:
         enabled: false
       persistence:
         enabled: false
+    - extraEnvVars:
+      - name: PIPELINES_URLS
+        value: https://raw.githubusercontent.com/tembleking/kube-helper-ai-demo/master/helper.py
     hooks:
       - events: [prepare]
         command: bash
