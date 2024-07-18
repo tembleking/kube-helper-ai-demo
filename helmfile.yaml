@@ -120,20 +120,13 @@ releases:
           clusterConfig:
             name: ai-demo-cluster
           sysdig:
-            region: custom
-            apiHost: https://secure-staging.sysdig.com
+            region: us2
             {{- $accessKey := requiredEnv "SYSDIG_ACCESS_KEY" }}
             accessKey: {{ $accessKey }}
           kspm:
             deploy: false
           gke:
             autopilot: true
-        agent:
-          collectorSettings:
-            collectorHost: collector-staging.sysdigcloud.com
-          # ebpf:
-          #   enabled: true
-          #   kind: universal_ebpf
         nodeAnalyzer:
           enabled: false
           nodeAnalyzer:
