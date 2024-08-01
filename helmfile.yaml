@@ -148,13 +148,13 @@ releases:
         admissionController:
           enabled: false
         clusterShield:
-          enabled: false
+          enabled: true
           cluster_shield:
             log_level: warn
             features:
               audit:
                 enabled: true
               container_vulnerability_management:
-                enabled: false
+                enabled: true
               posture:
-                enabled: false
+                enabled: true
