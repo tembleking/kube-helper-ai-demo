@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+kubectl delete namespace playground --grace-period=10  || true
+kubectl delete pod -n open-webui -l app.kubernetes.io/component=open-webui
+
+kubectl create namespace playground
+kubectl create rolebinding open-webui-pipelines-playground-edit \
+  --namespace playground \
+  --clusterrole edit \
+  --serviceaccount open-webui-pipelines:default
+kubectl create clusterrole cluster-view --resource '*.*' --verb get --verb list --verb watch || true
+kubectl create clusterrolebinding open-webui-pipelines-cluster-view \
+  --clusterrole cluster-view \
+  --serviceaccount open-webui-pipelines:default || true
