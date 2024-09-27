@@ -2,6 +2,7 @@
 
 kubectl delete namespace playground --grace-period=10  || true
 kubectl delete pod -n open-webui -l app.kubernetes.io/component=open-webui
+kubectl delete pod -n open-webui-pipelines -l app.kubernetes.io/component=pipelines
 
 kubectl create namespace playground
 kubectl create rolebinding open-webui-pipelines-playground-edit \
