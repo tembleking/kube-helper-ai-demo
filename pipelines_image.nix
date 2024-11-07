@@ -1,10 +1,9 @@
 {
   dockerTools,
-  stdenv,
   kubectl,
-  shadow,
   writeTextDir,
-}: let
+}:
+let
   baseImage = dockerTools.pullImage (import ./base_pipelines_image.nix);
 
   passwd-file = writeTextDir "etc/passwd" ''
@@ -70,11 +69,11 @@
       bash-history-file
     ];
     config = {
-      Entrypoint = ["bash" "start.sh"];
+      Entrypoint = [
+        "bash"
+        "start.sh"
+      ];
       WorkingDir = "/app";
-      # Env = [
-      #   "PATH=/run/wrappers/bin:/nix/profile/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin:/bin"
-      # ];
     };
     extraCommands = ''
       commandsToLink=(sh ls cat)
@@ -84,4 +83,4 @@
     '';
   };
 in
-  image
+image

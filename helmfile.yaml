@@ -1,3 +1,7 @@
+helmDefaults:
+  wait: true
+  timeout: 900
+
 repositories:
   - name: open-webui
     url: https://helm.openwebui.com/
