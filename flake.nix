@@ -43,9 +43,9 @@
             deploy = flake-utils.lib.mkApp {
               drv = pkgs.writeShellApplication {
                 name = "deploy";
-                runtimeInputs = [
-                  helmfile_with_plugins
-                  helm_with_plugins
+                runtimeInputs = with pkgs; [
+                  helmfile
+                  helm
                 ];
                 text = ''
                   helmfile apply -f ${./helmfile.yaml}
