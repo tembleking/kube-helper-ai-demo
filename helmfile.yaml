@@ -1,6 +1,6 @@
 helmDefaults:
   wait: true
-  timeout: 900
+  timeout: 1800
 
 repositories:
   - name: open-webui
