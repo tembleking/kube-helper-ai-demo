@@ -31,27 +31,14 @@
           helmfile_with_plugins = pkgs.helmfile-wrapped.override { inherit (helm_with_plugins) pluginsDir; };
 
           pipelines_image = pkgs.callPackage ./pipelines_image.nix { };
-
         in
         {
           packages = {
-            miner = pkgs.callPackage ./miner_image.nix { };
             default = pipelines_image;
           };
 
           apps = {
-            deploy = flake-utils.lib.mkApp {
-              drv = pkgs.writeShellApplication {
-                name = "deploy";
-                runtimeInputs = with pkgs; [
-                  helmfile
-                  kubernetes-helm
-                ];
-                text = ''
-                  helmfile sync -f ${./helmfile.yaml}
-                '';
-              };
-            };
+            deploy = flake-utils.lib.mkApp { drv = pkgs.callPackage ./deploy.nix { }; };
           };
 
           devShells.default = pkgs.mkShellNoCC {

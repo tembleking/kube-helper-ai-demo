@@ -125,11 +125,10 @@ releases:
     values:
       - global:
           clusterConfig:
-            name: ai-demo-cluster
+            name: {{ env "CLUSTER_NAME" | default "ai-demo-cluster" }}
           sysdig:
             region: us2
-            {{- $accessKey := requiredEnv "SYSDIG_ACCESS_KEY" }}
-            accessKey: {{ $accessKey }}
+            accessKey: {{ requiredEnv "SYSDIG_ACCESS_KEY" }}
           kspm:
             deploy: false
           gke:
