@@ -51,7 +51,7 @@ class OllamaPipelineFilter:
                 "OLLAMA_API_BASE_URL": os.getenv(
                     "OLLAMA_API_BASE_URL", "http://ollama.ollama.svc.cluster.local:11434"
                 ),
-                "TASK_MODEL": os.getenv("TASK_MODEL", "llama3:instruct"),
+                "TASK_MODEL": os.getenv("TASK_MODEL", "llama3.1:8b"),
                 "TEMPLATE": """Use the following context as your learned knowledge, inside <context></context> XML tags.
 <context>
     {{CONTEXT}}

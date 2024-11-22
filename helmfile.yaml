@@ -38,7 +38,7 @@ releases:
           - name: OLLAMA_BASE_URL
             value: "http://ollama.ollama.svc.cluster.local:11434"
           - name: DEFAULT_MODELS
-            value: llama3:instruct
+            value: llama3.1:8b
           - name: OPENAI_API_BASE_URL # This enables pipelines in the UI
             value: http://open-webui-pipelines.open-webui-pipelines.svc.cluster.local:9099
           - name: OPENAI_API_KEY
@@ -120,7 +120,7 @@ releases:
     values:
       - ollama:
           models:
-            - llama3:instruct
+            - llama3.1:8b
         nodeSelector: 
           cloud.google.com/gke-accelerator: nvidia-l4
           cloud.google.com/gke-accelerator-count: "1"
