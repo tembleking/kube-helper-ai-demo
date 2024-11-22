@@ -1,7 +1,7 @@
 {
   imageName = "ghcr.io/open-webui/pipelines";
-  imageDigest = "sha256:c89a1418cfa17f6f51f24998cd056cd880873dcde3b990b44fa96329b3a76a36";
-  sha256 = "1z4dr5qrdb18v56a4w2bqrm6iv1fpghbhk37849hriv8p8h3j8kn";
+  imageDigest = "sha256:5395bfc3c75f8ed9b4c3bca07637d152ab1b037d7253e5e3c860cbdcc0c80377";
+  sha256 = "0chyy9a3rfsc26a6dzn94czajjz7pcl0z2kwiapz1s0rxhs6qzqs";
   finalImageName = "ghcr.io/open-webui/pipelines";
-  finalImageTag = "git-98604da";
+  finalImageTag = "git-1367d95";
 }

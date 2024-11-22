@@ -60,7 +60,7 @@ let
 
   image = dockerTools.buildLayeredImage {
     name = "ghcr.io/tembleking/open-webui-pipelines";
-    tag = "latest";
+    tag = "0.0.2";
     fromImage = baseImage;
     contents = [
       kubectl
