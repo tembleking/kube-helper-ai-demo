@@ -16,12 +16,12 @@ releases:
     chart: open-webui/open-webui
     createNamespace: true
     atomic: true
-    version: 4.0.0
+    version: 5.17.0
     values:
       - image:
           pullPolicy: IfNotPresent
           repository: ghcr.io/open-webui/open-webui
-          tag: 0.4.3
+          tag: 0.5.16
       - ollama:
           enabled: false
         persistence:
@@ -38,7 +38,7 @@ releases:
           - name: OLLAMA_BASE_URL
             value: "http://ollama.ollama.svc.cluster.local:11434"
           - name: DEFAULT_MODELS
-            value: llama3.1:8b
+            value: deepseek-r1:8b
           - name: OPENAI_API_BASE_URL # This enables pipelines in the UI
             value: http://open-webui-pipelines.open-webui-pipelines.svc.cluster.local:9099
           - name: OPENAI_API_KEY
@@ -63,12 +63,12 @@ releases:
     chart: open-webui/pipelines
     createNamespace: true
     atomic: true
-    version: 0.0.4
+    version: 0.3.0
     values:
     - image:
         pullPolicy: Always
         repository: ghcr.io/tembleking/open-webui-pipelines
-        tag: 0.0.2
+        tag: 0.0.3
     - ingress:
         enabled: false
       persistence:
@@ -116,11 +116,13 @@ releases:
     chart: ollama-helm/ollama
     createNamespace: true
     atomic: true
-    version: 0.67.0
+    version: 1.6.0
     values:
       - ollama:
           models:
+            pull:
             - llama3.1:8b
+            - deepseek-r1:8b
         nodeSelector: 
           cloud.google.com/gke-accelerator: nvidia-l4
           cloud.google.com/gke-accelerator-count: "1"
@@ -132,7 +134,7 @@ releases:
     chart: sysdig/sysdig-deploy
     createNamespace: true
     atomic: true
-    version: 1.67.0
+    version: 1.77.1
     values:
       - global:
           clusterConfig:
