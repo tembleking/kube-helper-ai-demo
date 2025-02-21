@@ -91,14 +91,20 @@ Answer according to the language of the user's question.""",
         print("Tools:", tools_specs)
 
         fc_system_prompt = (
-            f"Tools: {json.dumps(tools_specs, indent=2)}"
-            + """
+            f"""
+The provided message will have <history></history> with all context of the previous messages in the conversation, and <user_query></user_query> with the last message sent by the user.
+You can use both the history and the user query to understand which function tool you need to pick, if they are relevant.
+
+You have the following function tools at your disposal: {json.dumps(tools_specs, indent=2)}
+
 If a function tool doesn't match the query, return an empty string. Else, pick a function tool, fill in the parameters from the function tool's schema, and return it in the format 
-    { "name": \"functionName\", "parameters": { "key": "value" } }
-Only pick a function if the user asks.
+    {{ "name": "functionName", "parameters": {{ "key": "value" }} }}
+
+Only pick a function relevant to the user needs, if it's applicable.
 Only return the object.
-The object must be a valid JSON.
-DO NOT RETURN ANY OTHER TEXT.
+The object MUST be a valid JSON in the specified format.
+
+## DO NOT RETURN ANY OTHER TEXT APART FROM THE JSON ##
 """
         )
 
@@ -152,14 +158,14 @@ DO NOT RETURN ANY OTHER TEXT.
                         },
                         {
                             "role": "user",
-                            "content": "History:\n"
+                            "content": "<history>\n"
                             + "\n".join(
                                 [
                                     f"{message['role']}: {message['content']}"
                                     for message in messages[::-1][:4]
                                 ]
-                            )
-                            + f"Query: {user_message}",
+                            ) + "</history>"
+                            + f"<user_query>{user_message}</user_query>",
                         },
                     ],
                 },
