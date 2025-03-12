@@ -144,6 +144,13 @@ releases:
             deploy: false
           gke:
             autopilot: true
+        agent:
+          sysdig:
+            settings:
+              drift_control:
+                enabled: true
+              drift_killer:
+                enabled: true
         nodeAnalyzer:
           enabled: false
           nodeAnalyzer:
