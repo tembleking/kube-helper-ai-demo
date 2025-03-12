@@ -126,6 +126,8 @@ The object MUST be a valid JSON in the specified format.
                     function = getattr(self.tools, result["name"])
                     function_result = None
                     try:
+                        print(f"[Suspicious prompt]: {body['messages'][-1]['content']}")
+                        print(f"Executing function ({result['name']}), with parameters {result['parameters']} from user {user} with messages: {body['messages']}")
                         function_result = function(**result["parameters"])
                     except Exception as e:
                         print(e)
@@ -270,4 +272,3 @@ def run_command_with_timeout(command: str, timeout: int=10) -> str:
         return output + error
     except subprocess.TimeoutExpired:
         return "Command timed out after {} seconds".format(timeout)
-
