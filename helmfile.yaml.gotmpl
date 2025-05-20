@@ -9,14 +9,27 @@ repositories:
     url: https://otwld.github.io/ollama-helm/
   - name: sysdig
     url: https://charts.sysdig.com
+  - name: ingress-nginx
+    url: https://kubernetes.github.io/ingress-nginx
 
 releases:
+  - name: ingress-nginx
+    namespace: ingress-nginx
+    chart: ingress-nginx/ingress-nginx
+    createNamespace: true
+    atomic: true
+    version: 4.12.2
+    values:
+      - controller:
+          ingressClassResource:
+            default: true
   - name: open-webui
     namespace: open-webui
     chart: open-webui/open-webui
     createNamespace: true
     atomic: true
     version: 4.0.0
+    needs: [ ingress-nginx/ingress-nginx ]
     values:
       - image:
           pullPolicy: IfNotPresent
@@ -57,7 +70,10 @@ releases:
           loadBalancerClass: ""
           nodePort: ""
           port: 80
-          type: LoadBalancer
+          type: ClusterIP
+        ingress:
+          enabled: true
+          host: open-webui.127-0-0-1.nip.io # To be edited later by the deploy script
   - name: open-webui-pipelines
     namespace: open-webui-pipelines
     chart: open-webui/pipelines
