@@ -2,10 +2,12 @@
   writeShellApplication,
   helmfile,
   kubernetes-helm,
+  util-linux,
 }:
 writeShellApplication {
   name = "deploy";
   runtimeInputs = [
+    util-linux
     helmfile
     kubernetes-helm
   ];
@@ -29,7 +31,7 @@ writeShellApplication {
         sleep 2
       done
 
-      NEW_HOST="open-webui.$IP.nip.io"
+      NEW_HOST="$(uuidgen).$IP.nip.io"
       echo "Patching ingress host to $NEW_HOST..."
 
       kubectl patch ingress $INGRESS_NAME -n $NAMESPACE \
@@ -40,7 +42,5 @@ writeShellApplication {
     }
 
     update_open_webui_ingress_hostname
-    
-    
   '';
 }
