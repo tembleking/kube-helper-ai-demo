@@ -1,7 +1,8 @@
+# nix run nixpkgs#nix-prefetch-docker ghcr.io/open-webui/pipelines git-26b8f20
 {
   imageName = "ghcr.io/open-webui/pipelines";
-  imageDigest = "sha256:5395bfc3c75f8ed9b4c3bca07637d152ab1b037d7253e5e3c860cbdcc0c80377";
-  sha256 = "0chyy9a3rfsc26a6dzn94czajjz7pcl0z2kwiapz1s0rxhs6qzqs";
+  imageDigest = "sha256:2c0f88879c9634a7b387bc472afeb2025b9d49b1d3afe4f756aecd343603763b";
+  hash = "sha256-saQ8ly4jPci/BZkFrM3Rr+/p+ZQ6JUHT8ppRUd6th7w=";
   finalImageName = "ghcr.io/open-webui/pipelines";
-  finalImageTag = "git-1367d95";
+  finalImageTag = "git-26b8f20";
 }

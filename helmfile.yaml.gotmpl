@@ -28,13 +28,13 @@ releases:
     chart: open-webui/open-webui
     createNamespace: true
     atomic: true
-    version: 4.0.0
+    version: 6.24.0
     needs: [ ingress-nginx/ingress-nginx ]
     values:
       - image:
           pullPolicy: IfNotPresent
           repository: ghcr.io/open-webui/open-webui
-          tag: 0.4.3
+          tag: 0.6.16
       - ollama:
           enabled: false
         persistence:
@@ -79,12 +79,12 @@ releases:
     chart: open-webui/pipelines
     createNamespace: true
     atomic: true
-    version: 0.0.4
+    version: 0.7.0
     values:
     - image:
         pullPolicy: Always
         repository: ghcr.io/tembleking/open-webui-pipelines
-        tag: 0.0.2
+        tag: 0.0.4
     - ingress:
         enabled: false
       persistence:
@@ -132,11 +132,13 @@ releases:
     chart: ollama-helm/ollama
     createNamespace: true
     atomic: true
-    version: 0.67.0
+    version: 1.24.0
     values:
       - ollama:
           models:
-            - llama3.1:8b
+            pull:
+              - llama3.1:8b
+              - deepseek-r1:8b
         nodeSelector: 
           cloud.google.com/gke-accelerator: nvidia-l4
           cloud.google.com/gke-accelerator-count: "1"
