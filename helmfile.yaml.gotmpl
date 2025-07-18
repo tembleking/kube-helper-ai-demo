@@ -147,53 +147,52 @@ releases:
             nvidia.com/gpu: 1
   - name: sysdig
     namespace: sysdig
-    chart: sysdig/sysdig-deploy
+    chart: sysdig/shield
     createNamespace: true
     atomic: true
-    version: 1.67.0
+    version: 1.12.6
     values:
-      - global:
-          clusterConfig:
-            name: {{ env "CLUSTER_NAME" | default "ai-demo-cluster" }}
-          sysdig:
-            region: us2
-            accessKey: {{ requiredEnv "SYSDIG_ACCESS_KEY" }}
-          kspm:
-            deploy: false
-          gke:
-            autopilot: true
-        agent:
-          sysdig:
-            settings:
-              drift_control:
-                enabled: true
-              drift_killer:
-                enabled: true
-        nodeAnalyzer:
-          enabled: false
-          nodeAnalyzer:
-            benchmarkRunner:
-              deploy: false
-            hostAnalyzer:
-              deploy: false
-            runtimeScanner:
-              deploy: false
-            imageAnalyzer:
-              deploy: false
-            hostScanner:
-              deploy: false
-        kspmCollector:
-          enabled: false
-        admissionController:
-          enabled: false
-        clusterShield:
-          enabled: true
-          cluster_shield:
-            log_level: warn
-            features:
-              audit:
-                enabled: true
-              container_vulnerability_management:
-                enabled: true
-              posture:
-                enabled: true
+      - cluster_config:
+          name: {{ env "CLUSTER_NAME" | default "ai-demo-cluster" }}
+          cluster_type: gke-autopilot
+        sysdig_endpoint:
+          region: us2
+          access_key: {{ requiredEnv "SYSDIG_ACCESS_KEY" }}
+        features:
+          kubernetes_metadata:
+            enabled: true
+          posture:
+            host_posture:
+              enabled: true
+            cluster_posture:
+              enabled: true
+          vulnerability_management:
+            host_vulnerability_management:
+              enabled: true
+            container_vulnerability_management:
+              enabled: true
+            in_use:
+              enabled: true
+          detections:
+            drift_control:
+              enabled: true
+            malware_control:
+              enabled: true
+            ml_policies:
+              enabled: true
+            kubernetes_audit:
+              enabled: true
+          investigations:
+            activity_audit:
+              enabled: true
+            live_logs:
+              enabled: true
+            network_security:
+              enabled: true
+            audit_tap:
+              enabled: true
+            captures:
+              enabled: true
+          respond:
+            response_actions:
+              enabled: true
