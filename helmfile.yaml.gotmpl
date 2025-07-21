@@ -28,13 +28,13 @@ releases:
     chart: open-webui/open-webui
     createNamespace: true
     atomic: true
-    version: 6.24.0
+    version: 6.26.0
     needs: [ ingress-nginx/ingress-nginx ]
     values:
       - image:
           pullPolicy: IfNotPresent
           repository: ghcr.io/open-webui/open-webui
-          tag: 0.6.16
+          tag: 0.6.18
       - ollama:
           enabled: false
         persistence:
@@ -56,6 +56,12 @@ releases:
             value: http://open-webui-pipelines.open-webui-pipelines.svc.cluster.local:9099
           - name: OPENAI_API_KEY
             value: 0p3n-w3bu!
+          - name: ENABLE_FOLLOW_UP_GENERATION
+            value: "false"
+          - name: ENABLE_AUTOCOMPLETE_GENERATION
+            value: "false"
+          - name: ENABLE_TAGS_GENERATION
+            value: "false"
         resources:
           limits:
             ephemeral-storage: 2Gi
