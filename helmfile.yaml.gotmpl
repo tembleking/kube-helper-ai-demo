@@ -62,6 +62,8 @@ releases:
             value: "false"
           - name: ENABLE_TAGS_GENERATION
             value: "false"
+          - name: ENABLE_WEBSOCKET_SUPPORT
+            value: "false"
         resources:
           limits:
             ephemeral-storage: 2Gi
@@ -95,6 +97,8 @@ releases:
         enabled: false
       persistence:
         enabled: false
+      serviceAccount:
+        automountServiceAccountToken: true
     - extraEnvVars:
       - name: PIPELINES_URLS
         value: https://raw.githubusercontent.com/tembleking/kube-helper-ai-demo/master/helper.py
@@ -108,21 +112,11 @@ releases:
             kubectl create rolebinding open-webui-pipelines-playground-edit \
               --namespace playground \
               --clusterrole edit \
-              --serviceaccount open-webui-pipelines:default || true;
+              --serviceaccount open-webui-pipelines:open-webui-pipelines || true;
             kubectl create clusterrole cluster-view --resource '*.*' --verb get --verb list --verb watch || true;
             kubectl create clusterrolebinding open-webui-pipelines-cluster-view \
               --clusterrole cluster-view \
-              --serviceaccount open-webui-pipelines:default || true;
-      - events: [postsync]
-        command: kubectl
-        args:
-          - patch
-          - deployment
-          - open-webui-pipelines
-          - -n
-          - open-webui-pipelines
-          - --type=json
-          - '-p=[{"op": "remove", "path": "/spec/template/spec/automountServiceAccountToken"}]'
+              --serviceaccount open-webui-pipelines:open-webui-pipelines || true;
       - events: [preuninstall]
         command: bash
         args:
@@ -138,13 +132,17 @@ releases:
     chart: ollama-helm/ollama
     createNamespace: true
     atomic: true
-    version: 1.24.0
+    version: 1.26.0
     values:
+      - image:
+          tag: 0.11.3
       - ollama:
           models:
             pull:
               - llama3.1:8b
-              - deepseek-r1:8b
+              - gpt-oss:latest
+            run:
+              - llama3.1:8b
         nodeSelector: 
           cloud.google.com/gke-accelerator: nvidia-l4
           cloud.google.com/gke-accelerator-count: "1"
