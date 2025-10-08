@@ -160,7 +160,7 @@ releases:
           name: {{ env "CLUSTER_NAME" | default "ai-demo-cluster" }}
           cluster_type: gke-autopilot
         sysdig_endpoint:
-          region: us2
+          region: {{ env "SYSDIG_REGION" | default "us2" }}
           access_key: {{ requiredEnv "SYSDIG_ACCESS_KEY" }}
         features:
           kubernetes_metadata:
